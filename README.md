@@ -1,26 +1,4 @@
-# Orientación Proyecto AC
-
-## Materiales
-
-Para la realización del proyecto se entregan junto con este informe los siguientes materiales:
-
-* Este documento (`README.md`)
-* `smips.pdf`
-* Scripts de Python para el testeo automático(`asambler.py`, `test.py` y `price.py`)
-* Dos archivos punto circ `s-mips-template.circ` y `s-mips.circ`.
-* Carpeta `tests` conteniendo diferentes archivos `.asm`
-
-## Orientación
-
-El objetivo de este proyecto es que puedan implementar usando `Logisim` una arquitectura para interpretar las instrucciones de S-MIPS. Los detalles relacionados a esta implementación estan descritos en el archivo [`s-mips.pdf`](./s-mips.pdf).
-
-## Detalles de la evaluación
-
-Se formarán equipos de hasta 2 integrantes para este proyecto. La entrega se realizará a través de GitHub. Un miembro de cada equipo deberá hacer un Fork [`Fork`](https://github.com/UH-Matcom-AC/Proyecto-SMIPS-2024-2025/fork) de este repositorio, donde desarrollarán su proyecto.
-
-Posteriormente, deberán crear un nuevo `Issue` en la pestaña [Issues](https://github.com/UH-Matcom-AC/Proyecto-SMIPS-2024-2025/issues) de este repositorio. En el cuerpo del Issue, deben incluir los nombres completos de los integrantes, el grupo al que pertenece cada uno y la URL del proyecto generado a partir del `Fork`. Como referencia, pueden consultar el `Issue` de ejemplo: [`Equipo #0`](https://github.com/UH-Matcom-AC/Proyecto-SMIPS-2024-2025/issues/1). El título del `Issue` debe seguir el formato `Equipo #n`, donde `n` corresponde al número del equipo y debe respetar el orden de los `Issues` existentes.
-
-La fecha límite para la entrega del proyecto es el 31 de enero de 2025 a las 11:59:59 PM. La entrega se considera automática, ya que no es necesario enviar archivos físicamente. Se tomarán en cuenta todos los commits realizados hasta la fecha límite como parte de la entrega del proyecto. Se recomienda que cada estudiante realice commits para documentar su trabajo individual, sugiriendo al menos un commit por cada componente implementado. Es fundamental evitar la creación de un único commit al final con todos los cambios del proyecto.
+# S-MIPS Arquitectura de Computadora
 
 ## Estructura de la plantilla
 
