@@ -1,82 +1,83 @@
-# S-MIPS Arquitectura de Computadora
+# S‑MIPS — Computer Architecture 🧠💻⚙️
 
-## Estructura de la plantilla
+Technical template for a small educational MIPS-like CPU. This repository provides:
+- an assembler to convert `.asm` files into Logisim memory banks 📄➡️💾
+- an automatic test runner that executes assembled tests in Logisim 🧪
+- a price calculator to estimate the "cost" of a Logisim circuit (used for grading) 💰
 
-La plantilla consta de 3 componentes principales:
+Use this README to understand repository layout, how to build tests, run them, and how the evaluation tools work. 🚀
 
-* CPU
-* RAM
-* RAM Dispatcher
+**Quick links**
+- Template circuit: `s-mips-template.circ`
+- Example implementation: `s-mips.circ`
+- Tests directory: `tests/` (contains many `.asm` testcases)
+- Output folder for test runner: `tests-out/`
 
-La RAM es la componente que simulará la memoria RAM de una computadora. Esta no requiere de ningún cambio para que el microprocesador funcione. La interfaz a travéz de la cuál se utilizá estará descrita en el [`s-mips.pdf`](./s-mips.pdf). El RAM Dispatcher está estrechamente relacionado con la RAM y es necesario para la ejecución automática de los tests.
+**Requirements** 🛠️
+- Python 3 (Unix: `python3`; Windows: `python`) 🐍
+- Logisim CLI available as `logisim` in PATH 🔌
+- Unix-like shell recommended for the provided scripts, but Windows PowerShell can be used with minor adjustments 🪟
 
-La CPU es la componente que usted deberá modificar para que interprete la instrucciones que cargue de la RAM y realice las operaciones correspondientes. Cualquier cambio fuera de esta componente será ignorado a la hora de hacer las revisiones por tanto limite cualquier cambio que considere importante a su interior.
+**Repository Structure (root)** 📁
+- `assembler.py`: Assembler that converts a single `.asm` file into memory bank files (`Bank`, `Bank0`, `Bank1`, `Bank2`, `Bank3`). Usage: `python3 assembler.py infile.asm -o output_dir` 🧩
+- `test.py`: Test runner that scans a tests directory, assembles each `.asm` test, and runs them in Logisim. Usage example below. 🧪
+- `price.py`: Price/complexity estimator for a Logisim `.circ` file. It inspects the circuit and computes a numeric "price" based on components used. Use to verify the implementation cost limit. 💰
+- `s-mips-template.circ`: The template Logisim circuit used by the test runner. It contains the test harness and expected subcircuit names. ⚙️
+- `s-mips.circ`: Example or student CPU implementation (the circuit you will edit for projects). 🧩
+- `tests/`: Directory with many `.asm` files. Each file may include a special comment line `#prints <expected-output>` (expected TTY output) and optionally `#limit <max-cycles>` to enforce speed limits. 📂
+- `tests-out/`: Default output folder where `test.py` writes assembled banks and per-test subfolders (created by the runner). 📂
 
-## Tests Automáticos
+**How the tests work** 🔁
+1. The test runner walks the `tests/` folder recursively and finds `.asm` files. 🔎
+2. For each `.asm`, it runs the assembler (`assembler.py`) to produce memory bank files under `./tests-out/<testname>/`. 🛠️
+3. It invokes Logisim with the template circuit to load the generated `Bank` file and runs until the CPU halts. The runner captures the TTY output and compares it with the `#prints` line from the `.asm` file. ✅/❌
+4. If a `#limit <n>` line exists, the test also checks the number of clock ticks does not exceed that limit (performance check). ⏱️
 
-El proyecto también incluye un conjunto de scripts en Python que permitirán realizar pruebas automáticas para conocer el estado actual del microprocesador y verificar que este funcione correctamente.
+**Common commands** 🧾
 
-### Requisitos para utilizar los tests automáticos
-
-Para poder ejecutar estos tests automáticos es necesario contar con los siguientes requisitos:
-
-* Sistema Operativo Unix
-* Python 3 instalado y accesible desde el comando `python3`
-* Logisim instalado y accesible desde el comando `logisim`
-
-### Pasos para ejecución
-
-Una vez cumplidos los requisitos necesarios los tests pueden ser ejecutados mediante el siguiente comando:
-
+Unix / macOS / Linux (recommended):
 ```bash
-./test.py tests s-mips.circ -o ./tests-out -t s-mips-template.circ
+# assemble a single test
+python3 assembler.py tests/hello.asm -o ./outdir
+
+# run the full test suite (from repo root)
+python3 test.py tests s-mips.circ -o ./tests-out -t s-mips-template.circ
 ```
 
-Este script dado un directorio escanea todos los ficheros `.asm` recursivamente dentro de dicho directorio y subdirectorios ensamblando el código de cada uno y generando los test correspondientes. Se espera encontrar dentro del fichero .asm una línea con un comentario de la siguiente forma:
-**#prints** [:space:] *salida esperada*
+Windows (PowerShell / CMD):
+```powershell
+# assemble a single test
+python assembler.py tests\\hello.asm -o .\\outdir
 
-Así cada test se ejecuta imprimiendo **OK** o **FAIL** en dependencia de si se obtuvo el resultado esperado o no. El script toma además varios niveles de verbosidad en el que brinda información más detallada de la ejecución.
+# run the full test suite
+python test.py tests s-mips.circ -o .\\tests-out -t s-mips-template.circ
+```
 
-### Agregar nuevos casos de prueba
+Note: `test.py` currently calls the assembler via `python3 assembler.py ...`. On Windows, edit the `compile()` function in `test.py` or make sure `python3` points to your Python executable (or create an alias). 📝
 
-Para crear nuevos casos de prueba se deberá crear un nuevo archivo `<test>.asm`. Es archivo contendrá el código que ejecutará el microprocesador. Estas instrucciones serán tomadas de las descritas en el [`s-mips.pdf`](./s-mips.pdf). Para definir cuál es el resultado correcto a mostrar por este código deberá estar definido una línea con el siguiente formato: `#prints <salida>`. Para mejor visualización de esto ver los casos de prueba existentes.
+**Assembler details** 🛠️
+- The assembler produces four byte-bank files named `Bank0`, `Bank1`, `Bank2`, `Bank3` plus a combined `Bank` file. These are Logisim memory images in `v2.0 raw` format. The output directory structure expected by the test runner is `tests-out/<testname>/Bank*`. 💾
+- Typical assembler usage: `python3 assembler.py infile.asm -o output_dir` (see `assembler.py -h` for options). 📜
 
-### Ejecución Manual
+**Price calculator** 💰
+- Run `price.py` to compute the cost of your `s-mips.circ` (or another circuit). Example:
+```bash
+python3 price.py s-mips.circ "S-MIPS" -l 100
+```
+- The tool returns a JSON object (or writes to `-o` file) and exits with non-zero if the price exceeds the provided `-l` limit. The default acceptance price is usually `100` units for grading. ⚖️
 
-Para aquellos casos en los que se desee hacer un ejecución manual de uno de los casos de prueba se deben seguir los siguientes pasos:
+**How to add new tests** ✍️
+1. Create a new `<name>.asm` under `tests/` (or a subfolder). 🧾
+2. Add a line `#prints expected_output` to specify the expected TTY output. Optionally add `#limit <cycles>` to define a cycle limit. ⌛
+3. Run the full test suite or assemble and run manually in Logisim as shown above. 🧪
 
-1- Realizar el ensamblado de los casos de pruebas a utilizar. Para ello se debe usar el script `assembler.py`. Este recibe como parámetros el archivo con el código ensamblador y el directorio de salida. Ver la ayuda.
+**Manual testing with Logisim (GUI)** 🖥️
+1. Run `assembler.py` to produce `Bank*` files for your test. 🧩
+2. Open `s-mips.circ` in Logisim. 📂
+3. Inside the `RAM Dispatcher` (or RAM component), load the `Bank` file (Right click → Load Image) or load `Bank0..Bank3` if using manual bank mode. ⚙️
+4. Toggle the clock; the CPU should start executing the program and emit TTY output. 🔁
 
-2- Una vez ejecutado el script buscar en la carpeta que existan 5 archivos llamados `Bank`, `Bank0`, `Bank1`, `Bank2` y `Bank3`.
-
-3- Abrir en `logisim` el circuito `s-mips.circ`.
-
-Opción 1 (Más sencilla):
-
-4- Dejar desactivada la entrada nombrada `Deshabilitar Dispatcher`.
-
-5- Luego se procede a cargar el archivos `Bank` dentro de la componente `RAM` del circuito `RAM Dispatcher`. Para ello debe entrar al circuito `RAM Dispatcher`, buscar en esta componente la componente `Bank` o también llamada `RAM`, y hacer click derecho sobre ella. Luego hacer click en cargar imagen. Finalmente seleccionar el archivo `Bank` correspondiente del caso de prueba a utilizar.
-
-Opción 2 (Más compleja):
-
-4- Activar la entrada nombrada `Deshabilitar Dispatcher`.
-
-5- Luego se procede a cargar los archivos `Bank0`, `Bank1`, `Bank2` y `Bank3` dentro de la componente `RAM`. Para ello debe buscar en esta componente las etiquetas con nombres similares. Por cada componente `Bank`(llamada también `RAM` en logisim) hacer click derecho sobre ella, hacer click en cargar imagen, y finalmente seleccionar el archivo `Bank#` correspondiente con el número del `Bank` y según el caso de prueba a utilizar. Importante asegurarse de haber utilizado los bancos correctos. La búsqueda al cargar imagen recuerda direcciones separadas del resto.
-
-Por último y común para cualquier opción:
-
-6- Conmutar el reloj. Si todos los pasos fueron seguidos de forma correcta el microprocesador deberá empezar a ejecutar las instrucciones almacenadas ahora en la RAM.
-
-### Requisitos
-
-Para considerar un microprocesador como válido se deberán cumplir dos requisitos de precio, eficiencia y correctitud.
-
-La correctitud se tomará en base a un conjunto de casos de pruebas que incluye los entregados con esta plantilla. En cada caso de prueba la salida de su microproseador por pantalla deberá coincidir con la salida establecida por la línea `#prints <salida>` en el caso de prueba. La salida de su microprocesador es aquella resultante de la ejecución de la instrucción `tty` en el código.
-
-Junto al proyecto se entrega otro script de python `price.py` que permite dado un archivo `circ` calcular un precio del microprocesador. Dicho precio se calcula en base a las componentes utilizadas para la creación del mismo. El precio de un microprocesador para ser aceptado tendrá que tener un precio menor o igual a las `100` unidades.
-
-La eficiencia será medida en base a la cantidad de ciclos del reloj que toma completar un caso de prueba determinado. Este límite estará dado por `x` ciclos del reloj. Esto será establecido para cada caso de prueba. El número exacto para un caso de prueba estará dado por la línea `#limit <cant-iterciones>`. El número exacto no está definido aún para todos los tests pero si será tomado en cuenta a la hora de la evaluación.
-
-### Precisiones Adicionales
-
-Para el correcto funcionamiento de los tests automáticos las componentes `RAM` de `logisim` (no la `RAM` implementada en la plantilla) utilizadas en el `s-mips.circ` deben cumplir ciertas condiciones. Para evitar conflictos, y puesto que tampoco es necesario, queda prohibido utilizar dichas componentes como partes de alguna de las componentes a implementar.
+Tips & gotchas ⚠️
+- Ensure the Logisim version you use supports the command-line flags the test runner expects. The runner calls `logisim` with `-tty`, `-load`, and other options. 🔍
+- If tests fail due to assembly commands on Windows, modify `test.py` `compile()` to call `python` instead of `python3`. 🪛
+- Do not modify files outside the CPU component when implementing the CPU — autograders ignore changes outside the CPU subcircuit. 🛡️
